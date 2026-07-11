@@ -14,14 +14,17 @@ def show():
   
   df=st.session_state["df"]
   payments_df = df[["Year","Remaining Balance"]].groupby("Year").min()
+  
   st.write("")
   st.write("")
 
   st.subheader("Remaining Balance Trend")
   st.write("")
   st.line_chart(payments_df)
+
   st.write("")
   st.write("")
+
   st.subheader("Yearly Comparison")
   st.write("")
   st.bar_chart(payments_df)

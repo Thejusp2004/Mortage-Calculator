@@ -9,6 +9,7 @@ def show():
    with col2:
     st.title("📊 Payment Schedule")
     st.caption("Detailed monthly repayment breakdown.")
+    
     st.write("")
     st.write("")
     

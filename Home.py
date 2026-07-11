@@ -19,8 +19,10 @@ def show():
        st.title("🏦 Mortgage Repayment Calculator")
        st.caption("Plan your home loan repayments intelligently.")
     st.write("")
+
     st.subheader("Input Data")
     st.write("")
+    
     col1,col2,col3,col4 = st.columns(4)
     home_value = col1.number_input("Home Value", min_value=0,value = 500000)
     deposit = col2.number_input("Deposit",min_value=0,value=100000)
@@ -29,10 +31,14 @@ def show():
 
     loan_amount = home_value - deposit
     monthly_interest_rate=(interest_rate/100)/12
-    number_of_payments = loan_term * 12
-    monthly_payment = (loan_amount * (
-                    (monthly_interest_rate * ((1 + monthly_interest_rate) ** number_of_payments))
-                    / (((1 + monthly_interest_rate) ** number_of_payments)- 1)))
+
+    if monthly_interest_rate == 0:
+      monthly_payment = loan_amount / number_of_payments
+    else:
+      number_of_payments = loan_term * 12
+      monthly_payment = (loan_amount * (
+                     (monthly_interest_rate * ((1 + monthly_interest_rate) ** number_of_payments))
+                     / (((1 + monthly_interest_rate) ** number_of_payments)- 1)))
 
     total_payments = monthly_payment * number_of_payments
     total_interest = total_payments - loan_amount
@@ -51,15 +57,19 @@ def show():
     remaining_balance = loan_amount
 
     for i in range(1, number_of_payments + 1):
+       if monthly_interest_rate == 0:
+        interest_payment = 0
+        principal_payment = monthly_payment
+       else:
         interest_payment = remaining_balance * monthly_interest_rate
         principal_payment = monthly_payment - interest_payment
-        remaining_balance -= principal_payment
-        year = math.ceil(i / 12)
 
-        schedule.append(
-            [i,monthly_payment,principal_payment,
-            interest_payment,remaining_balance,year]
-            )
+    remaining_balance -= principal_payment
+    year = math.ceil(i / 12)
+
+    schedule.append(
+      [i,monthly_payment,principal_payment,
+      interest_payment,remaining_balance,year])
 
     df = pd.DataFrame(schedule,
                     columns=["Month","Payment","Principal","Interest","Remaining Balance","Year"])
