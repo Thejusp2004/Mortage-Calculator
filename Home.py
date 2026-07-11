@@ -22,20 +22,25 @@ def show():
 
     st.subheader("Input Data")
     st.write("")
-    
+
     col1,col2,col3,col4 = st.columns(4)
     home_value = col1.number_input("Home Value", min_value=0,value = 500000)
     deposit = col2.number_input("Deposit",min_value=0,value=100000)
     interest_rate = col3.number_input("Interest rate ( in % )",min_value=0.0,value=5.5)
     loan_term=col4.number_input("Loan Term (in years)",min_value=1,value=30)
 
-    loan_amount = home_value - deposit
+    loan_amount = max(home_value - deposit,0)
+    
+    if deposit > home_value:
+      st.error("Deposit cannot exceed Home Value.")
+      return
+    
     monthly_interest_rate=(interest_rate/100)/12
-
+    number_of_payments = loan_term * 12
     if monthly_interest_rate == 0:
       monthly_payment = loan_amount / number_of_payments
     else:
-      number_of_payments = loan_term * 12
+      
       monthly_payment = (loan_amount * (
                      (monthly_interest_rate * ((1 + monthly_interest_rate) ** number_of_payments))
                      / (((1 + monthly_interest_rate) ** number_of_payments)- 1)))
@@ -64,12 +69,14 @@ def show():
         interest_payment = remaining_balance * monthly_interest_rate
         principal_payment = monthly_payment - interest_payment
 
-    remaining_balance -= principal_payment
-    year = math.ceil(i / 12)
+       remaining_balance -= principal_payment
+       if remaining_balance < 0:
+        remaining_balance = 0
+       year = math.ceil(i / 12)
 
-    schedule.append(
-      [i,monthly_payment,principal_payment,
-      interest_payment,remaining_balance,year])
+       schedule.append(
+         [i,monthly_payment,principal_payment,
+         interest_payment,remaining_balance,year])
 
     df = pd.DataFrame(schedule,
                     columns=["Month","Payment","Principal","Interest","Remaining Balance","Year"])
